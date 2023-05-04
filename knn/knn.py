@@ -115,7 +115,7 @@ if __name__ == "__main__":
     for i_k in range(1,21,2):
         for i_distancia in range(0,2):
             if(i_distancia == 0): distancia = 'euclidian'
-            if(i_distancia == 1): distancia = 'manhattam'
+            if(i_distancia == 1): distancia = 'manhattan'
             for i_pct in range(0,3):
                 #for qtd in range(0, 5):
                 pct_cnj = 0.25
