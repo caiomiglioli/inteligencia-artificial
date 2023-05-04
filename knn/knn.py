@@ -4,10 +4,9 @@ DONE - Normalizar os dados com Min-Max ou Z-score ;
 DONE - Seu algoritmo deve avaliar o desempenho para diferentes valores de k {1,3,5,7,9,11,13,15,17,19} ;
 DONE - Usar a distância Euclidiana ou Manhattan ;
 
-DONE - Separar o conjunto de treinamento (aleatoriamente) em 25%, 50% e 100% dos dados de treinamento. 
-TODO - Avaliar qual o impacto de usar mais e menos instâncias no conjunto de treinamento.
+DONE - Separar o conjunto de treinamento (aleatoriamente) em 25%, 50% e 100% dos dados de treinamento. Avaliar qual o impacto de usar mais e menos instâncias no conjunto de treinamento.
 
-    - Ao utilizar apenas 25% do conjunto de treinamento, pode ser observada uma redução considerável da porcentagem de acertos- caindo
+    -> Ao utilizar apenas 25% do conjunto de treinamento, pode ser observada uma redução considerável da porcentagem de acertos- caindo
     mais de 10% em alguns casos - já ao utilizar 50% do conjunto o resultado se manteve em torno de 80%, que é próximo ao resultado com
     o conjunto todo (83.3%). Com isso, afirma-se que é possível utilizar menos dados e manter uma boa taxa de acertos, dessa forma o 
     treinamento é otimizando.
@@ -108,26 +107,31 @@ if __name__ == "__main__":
     #knn = Knn('./digitos/treino_2x2.txt', porcentagem_conjunto=1)
     #knn.testSet('./digitos/teste_2x2.txt', k=3)
 
+    distancia = 'euclidian'
+
     with open('resultados.txt', 'w') as file:
-        file.write('porcentagem_usada_treino,resultado\n')
+        file.write('k,distancia,porcentagem_usada_treino,resultado\n')
 
-    for i in range(0, 3):
-        for j in range(1, 10):
-            print(i, j)
-            pct_cnj = 0.25
-            if i == 1: 
-                pct_cnj = 0.5
+    for i_k in range(1,21,2):
+        for i_distancia in range(0,2):
+            if(i_distancia == 0): distancia = 'euclidian'
+            if(i_distancia == 1): distancia = 'manhattam'
+            for i_pct in range(0,3):
+                #for qtd in range(0, 5):
+                pct_cnj = 0.25
+                if i_pct == 1: 
+                    pct_cnj = 0.5
 
-            if i == 2: 
-                pct_cnj = 1
+                if i_pct == 2: 
+                    pct_cnj = 1
 
-            with open('resultados.txt', 'a') as file:
-                file.write(f'{pct_cnj}')
-                
+                with open('resultados.txt', 'a') as file:
+                    file.write(f'{i_k},{distancia},{pct_cnj}')
+                    
 
-            knn = Knn('./digitos/treino_2x2.txt', porcentagem_conjunto=pct_cnj)
-            knn.testSet('./digitos/teste_2x2.txt', k=3)
+                knn = Knn('./digitos/treino_2x2.txt', porcentagem_conjunto=pct_cnj)
+                knn.testSet('./digitos/teste_2x2.txt', i_k, distancia)
 
-            if i == 2:
-                break
+                if i_pct == 2:
+                    break
 
