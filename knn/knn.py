@@ -29,25 +29,29 @@ class Knn:
         self.treino = self.__openFile(filename, tipo_arquivo='treino', porcentagem_conjunto=porcentagem_conjunto)
     #end constructor
 
+    def classify(self, features, k, dist='Euclidian'):
+        d = list()
+        for treino in self.treino:
+            if dist.lower() == 'manhattan':
+                d.append({ 'dist': distance.cityblock(features, treino[:-1]), 'class': treino[-1] } )
+            else:
+                d.append({ 'dist': distance.euclidean(features, treino[:-1]), 'class': treino[-1] } )
+
+        d.sort(key=lambda a : a['dist'])
+        p = Series([_d['class'] for _d in d[:k]]).value_counts()
+        return p.keys()[0]
+    #end classify
+
     def testSet(self, filename, k, distance='Euclidian'):
         testset = self.__openFile(filename, tipo_arquivo='teste')
         # results = list()
         acertos = 0
 
-        print('Realizando testes...')
+        print('TESTSET: Realizando testes...')
         for teste in testset:
-            dist = list()
-            for treino in self.treino:
-                if distance.lower() == 'manhattan':
-                    dist.append(self.__distManhattan(teste,treino))
-                else:
-                    dist.append(self.__distEuclidian(teste,treino))
-
-            dist.sort(key=lambda a : a['dist'])            
-            p = Series([d['class'] for d in dist[:k]]).value_counts()
-
-            # results.append({'result': p.keys()[0] == teste[-1], 'chute': p.keys()[0], 'classe': teste[-1]})
-            if p.keys()[0] == teste[-1]:
+            c = self.classify(teste[:-1],k,dist=distance)
+            # results.append({'result': c == teste[-1], 'chute': c, 'classe': teste[-1]})
+            if c == teste[-1]:
                 acertos += 1
 
         #exibir resultado
@@ -55,10 +59,7 @@ class Knn:
         print(f'Configurações: teste={filename}, k={k}, dist={distance}')
         print(f'Taxa de acerto {acertos/testset.shape[0]*100:.1f}%\n')
 
-        with open('resultados.txt', 'a') as file:
-            file.write(f',{acertos/testset.shape[0]*100:.1f}\n')
-
-        #return acertos/testset.shape[0]*100
+        return acertos/testset.shape[0]*100
     #end testset
 
     # ================================================================
@@ -91,31 +92,31 @@ class Knn:
             
         except:
             print(f'Erro ao abrir arquivo {filename.split("/")[-1]}')
-
     #end openfile
 
-    def __distEuclidian(self, teste, treino):
-        return { 'dist': distance.euclidean(teste[:-1], treino[:-1]), 'class': treino[-1] }
-    #end euclidian
+    # def __distEuclidian(self, teste, treino):
+    #     return { 'dist': distance.euclidean(teste, treino), 'class': treino[-1] }
+    # #end euclidian
 
-    def __distManhattan(self, teste, treino):
-        return { 'dist': distance.cityblock(teste[:-1], treino[:-1]), 'class': treino[-1] }
-    #end euclidian
+    # def __distManhattan(self, teste, treino):
+    #     return { 'dist': distance.cityblock(teste, treino), 'class': treino[-1] }
+    # #end euclidian
 #end knn
 
 if __name__ == "__main__":
-    #knn = Knn('./digitos/treino_2x2.txt', porcentagem_conjunto=1)
-    #knn.testSet('./digitos/teste_2x2.txt', k=3)
+    # knn = Knn('./digitos/treino_3x3.txt', porcentagem_conjunto=1)
+    # knn.testSet('./digitos/treino_3x3.txt', k=3)
 
-    distancia = 'euclidian'
+    # automação do teste
+    arqTreino = './digitos/treino_3x3.txt'
+    arqTeste = './digitos/teste_3x3.txt'
 
-    with open('resultados.txt', 'w') as file:
+    with open(f'{arqTeste.split("/")[-1]}-resultados.txt', 'w') as file:
         file.write('k,distancia,porcentagem_usada_treino,resultado\n')
 
     for i_k in range(1,21,2):
         for i_distancia in range(0,2):
-            if(i_distancia == 0): distancia = 'euclidian'
-            if(i_distancia == 1): distancia = 'manhattan'
+            distancia = 'euclidian' if i_distancia == 0 else 'manhattan'
             for i_pct in range(0,3):
                 #for qtd in range(0, 5):
                 pct_cnj = 0.25
@@ -125,12 +126,10 @@ if __name__ == "__main__":
                 if i_pct == 2: 
                     pct_cnj = 1
 
-                with open('resultados.txt', 'a') as file:
-                    file.write(f'{i_k},{distancia},{pct_cnj}')
-                    
-
-                knn = Knn('./digitos/treino_2x2.txt', porcentagem_conjunto=pct_cnj)
-                knn.testSet('./digitos/teste_2x2.txt', i_k, distancia)
+                with open(f'{arqTeste.split("/")[-1]}-resultados.txt', 'a') as file:
+                    knn = Knn(arqTreino, porcentagem_conjunto=pct_cnj)
+                    pc = knn.testSet(arqTeste, i_k, distancia)
+                    file.write(f'{i_k},{distancia},{pct_cnj},{pc:.1f}\n')
 
                 if i_pct == 2:
                     break
