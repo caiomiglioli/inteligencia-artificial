@@ -25,4 +25,4 @@ yarn-error.log*
 
 **/__pycache__/
 
-a2z/NIST
+char-classify/NIST
