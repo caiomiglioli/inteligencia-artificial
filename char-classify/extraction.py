@@ -44,6 +44,6 @@ def extract(filelist, datasetFolder, output):
 # end extraction
 
 if __name__ == '__main__':
-    extract('./NIST_Train_Upper.txt', './NIST', output='treino.csv')
-    extract('./NIST_Test_Upper.txt', './NIST', output='teste.csv')
-    extract('./NIST_Valid_Upper.txt', './NIST', output='validacao.csv')
+    extract('./datasets/NIST_Train_Upper.txt', './NIST', output='/output/treino.csv')
+    extract('./datasets/NIST_Test_Upper.txt', './NIST', output='/output/teste.csv')
+    extract('./datasets/NIST_Valid_Upper.txt', './NIST', output='/output/validacao.csv')

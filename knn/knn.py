@@ -47,7 +47,7 @@ class Knn:
         # results = list()
         acertos = 0
 
-        print('TESTSET: Realizando testes...')
+        # print('TESTSET: Realizando testes...')
         for teste in testset:
             c = self.classify(teste[:-1],k,dist=distance)
             # results.append({'result': c == teste[-1], 'chute': c, 'classe': teste[-1]})
@@ -104,33 +104,19 @@ class Knn:
 #end knn
 
 if __name__ == "__main__":
+    #### ------------------------- Como usar
     # knn = Knn('./digitos/treino_3x3.txt', porcentagem_conjunto=1)
-    # knn.testSet('./digitos/treino_3x3.txt', k=3)
+    # acuracia = knn.testSet('./digitos/treino_3x3.txt', k=3)
 
-    # automação do teste
+    #### ------------------------- Automação do teste
     arqTreino = './digitos/treino_3x3.txt'
     arqTeste = './digitos/teste_3x3.txt'
 
-    with open(f'{arqTeste.split("/")[-1]}-resultados.txt', 'w') as file:
+    with open(f'output-{arqTeste.split("/")[-1].split(".")[0]}.csv', 'w') as file:
         file.write('k,distancia,porcentagem_usada_treino,resultado\n')
-
-    for i_k in range(1,21,2):
-        for i_distancia in range(0,2):
-            distancia = 'euclidian' if i_distancia == 0 else 'manhattan'
-            for i_pct in range(0,3):
-                #for qtd in range(0, 5):
-                pct_cnj = 0.25
-                if i_pct == 1: 
-                    pct_cnj = 0.5
-
-                if i_pct == 2: 
-                    pct_cnj = 1
-
-                with open(f'{arqTeste.split("/")[-1]}-resultados.txt', 'a') as file:
-                    knn = Knn(arqTreino, porcentagem_conjunto=pct_cnj)
-                    pc = knn.testSet(arqTeste, i_k, distancia)
-                    file.write(f'{i_k},{distancia},{pct_cnj},{pc:.1f}\n')
-
-                if i_pct == 2:
-                    break
-
+        for K in range(1,21,2):
+            for distancia in ['euclidian', 'manhattan']:
+                for porcentagem in [0.25, 0.5, 1]:
+                    knn = Knn(arqTreino, porcentagem_conjunto=porcentagem)
+                    acuracia = knn.testSet(arqTeste, K, distancia)
+                    file.write(f'{K},{distancia},{porcentagem},{acuracia:.2f}%\n')
